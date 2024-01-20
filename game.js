@@ -12,18 +12,20 @@ class Ship {
     this.squares = squares;
   }
 
+  isSunk() {
+    return this.hits === this.squares;
+  }
+
   hitOrSank() {
     this.hits++;
-    if(this.hits === this.squares - 1) {
+    if(this.isSunk()) {
       alert(`You sank the ${this.name}!`);
     } else {
       alert(`You hit the ${this.name}!`);
     }
   }
 
-  isSunk() {
-    return this.hits === this.squares;
-  }
+
 }
 
 function initGame(rows, columns) {
