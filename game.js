@@ -1,5 +1,5 @@
-// Step 1: Init a game with grid 10x10 and place 1 battleship (5 squares) and 2 destroyers (4 squares) at the random place on the grid
-// Step 2: Play click (or enter with keyboard) a cell eg. A5, check if the cell hits, misses, or sinks any of the battleship or destroyers
+// Step 1: Init a game with a 10x10 grid and place 1 battleship (5 squares) and 2 destroyers (4 squares) at a random place on the grid
+// Step 2: Click (or enter with keyboard) a cell and check if it hits, misses, or sinks any of the ships
 // Step 3: The game ends when all ships are sunk
 
 class Ship {
@@ -72,9 +72,9 @@ function initGame(rows, columns) {
     1 random array with sequence of 5
     2 random arrays with sequence of 4
     */
-    markRandomSequence(gridContainer, 5, battleship);
-    markRandomSequence(gridContainer, 4, destroyer1); 
-    markRandomSequence(gridContainer, 4, destroyer2);
+    markRandomSequence(gridContainer, battleship.squares, battleship);
+    markRandomSequence(gridContainer, destroyer1.squares, destroyer1); 
+    markRandomSequence(gridContainer, destroyer2.squares, destroyer2);
   });
 
   function checkEndGame() {
