@@ -2,45 +2,34 @@
 // Step 2: Play click (or enter with keyboard) a cell eg. A5, check if the cell hits, misses, or sinks any of the battleship or destroyers
 // Step 3: The game ends when all ships are sunk
 
-class Battleship {
-  name = "battleship";
+class Ship {
+  name;
   hits = 0;
-  squares = 5;
+  squares;
+
+  constructor(name, squares) {
+    this.name = name;
+    this.squares = squares;
+  }
 
   hitOrSank() {
+    this.hits++;
     if(this.hits === this.squares - 1) {
       alert(`You sank the ${this.name}!`);
     } else {
       alert(`You hit the ${this.name}!`);
-      this.hits++;
     }
   }
-}
 
-class Destroyer {
-  name
-  hits = 0;
-  squares = 4;
-
-  constructor(name) {
-    this.name = name
-  }
-
-  hitOrSank() {
-    if(this.hits === this.squares - 1) {
-      alert(`You sank the ${this.name}!`);
-    } else {
-      alert(`You hit the ${this.name}!`);
-      this.hits++;
-    }
+  isSunk() {
+    return this.hits === this.squares;
   }
 }
-
 
 function initGame(rows, columns) {
-  const battleship = new Battleship()
-  const destroyer1 = new Destroyer("destroyer1")
-  const destroyer2 = new Destroyer("destroyer2")
+  const battleship = new Ship("battleship", 5);
+  const destroyer1 = new Ship("destroyer1", 4);
+  const destroyer2 = new Ship("destroyer2", 4);
 
   document.addEventListener('DOMContentLoaded', function () {
     let gridContainer = document.getElementById('gridContainer');
@@ -55,18 +44,21 @@ function initGame(rows, columns) {
               if (this.dataset.shipType === battleship.name) {
                 battleship.hitOrSank();
                 this.classList.add("disabled")
+                checkEndGame()
                 return;
               }
           
               if(this.dataset.shipType === destroyer1.name) {
                 destroyer1.hitOrSank();
                 this.classList.add("disabled")
+                checkEndGame()
                 return;
               }
           
               if(this.dataset.shipType === destroyer2.name) {
                 destroyer2.hitOrSank();
                 this.classList.add("disabled")
+                checkEndGame()
                 return;
               }
 
@@ -83,7 +75,21 @@ function initGame(rows, columns) {
     markRandomSequence(gridContainer, 5, battleship);
     markRandomSequence(gridContainer, 4, destroyer1); 
     markRandomSequence(gridContainer, 4, destroyer2);
-});
+  });
+
+  function checkEndGame() {
+    if (battleship.isSunk() && destroyer1.isSunk() && destroyer2.isSunk()) {
+      alert("Congratulations! You've sunk all ships. Game Over!");
+      
+      resetGame()
+    }
+  }
+
+  function resetGame() {
+    setTimeout(function(){
+      location.reload();
+    }, 2000);
+  }
 }
 
 function markRandomSequence(gridContainer, squaresNumber, ship) {
@@ -100,7 +106,7 @@ function markRandomSequence(gridContainer, squaresNumber, ship) {
     const row = isRow ? startRow : startRow + i;
     const col = isRow ? startCol + i : startCol;
 
-    let cell = gridContainer.children[row * 10 + col];
+    const cell = gridContainer.children[row * 10 + col];
     cell.classList.add(ship.name)
     cell.dataset.shipType = ship.name;
   }
@@ -111,7 +117,7 @@ function checkCollision(gridContainer, startRow, startCol, squaresNumber, isRow)
     const row = isRow ? startRow : startRow + i;
     const col = isRow ? startCol + i : startCol;
 
-    let cell = gridContainer.children[row * 10 + col];
+    const cell = gridContainer.children[row * 10 + col];
     if (cell.dataset.shipType) {
       return true;
     }
