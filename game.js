@@ -24,8 +24,6 @@ class Ship {
       alert(`You hit the ${this.name}!`);
     }
   }
-
-
 }
 
 function initGame(rows, columns) {
