@@ -31,6 +31,8 @@ function initGame(rows = 10, columns = 10) {
   const destroyer1 = new Ship("destroyer1", 4);
   const destroyer2 = new Ship("destroyer2", 4);
 
+  const shipPositions = {}; 
+
   document.addEventListener('DOMContentLoaded', function () {
     let gridContainer = document.getElementById('gridContainer');
 
@@ -42,13 +44,14 @@ function initGame(rows = 10, columns = 10) {
 
             // Make every cell focusable
             gridItem.tabIndex = 0;
+
             gridItem.onclick = function () {
-              handleCellClick(this);
+              handleCellClick(this, i, j);
             };
       
             gridItem.addEventListener('keydown', function (event) {
               if (event.key === 'Enter' && !gridItem.classList.contains("disabled")) {
-                handleCellClick(this);
+                handleCellClick(this, i, j);
               } else if (event.key === 'ArrowLeft') {
                 moveFocus(this, -1);
               } else if (event.key === 'ArrowUp') {
@@ -63,9 +66,9 @@ function initGame(rows = 10, columns = 10) {
     }
 
     // Create 1 battleship and 2 destroyers randomly on the grid: 
-    markRandomSequence(gridContainer, battleship, rows, columns);
-    markRandomSequence(gridContainer, destroyer1, rows, columns); 
-    markRandomSequence(gridContainer, destroyer2, rows, columns);
+    markRandomSequence(gridContainer, battleship, rows, columns, shipPositions);
+    markRandomSequence(gridContainer, destroyer1, rows, columns, shipPositions); 
+    markRandomSequence(gridContainer, destroyer2, rows, columns, shipPositions);
     gridContainer.children[0].focus();
   });
 
@@ -83,16 +86,19 @@ function initGame(rows = 10, columns = 10) {
     
     Array.from(gridItems).forEach((item) => {
       item.classList.remove(battleship.name, destroyer1.name, destroyer2.name, 'disabled');
-      item.dataset.shipType = '';
     });
   
     battleship.hits = 0;
     destroyer1.hits = 0;
     destroyer2.hits = 0;
+
+    shipPositions.battleship = [];
+    shipPositions.destroyer1 = [];
+    shipPositions.destroyer2 = [];
   
-    markRandomSequence(gridContainer, battleship, rows, columns);
-    markRandomSequence(gridContainer, destroyer1, rows, columns); 
-    markRandomSequence(gridContainer, destroyer2, rows, columns);
+    markRandomSequence(gridContainer, battleship, rows, columns, shipPositions);
+    markRandomSequence(gridContainer, destroyer1, rows, columns, shipPositions); 
+    markRandomSequence(gridContainer, destroyer2, rows, columns, shipPositions);
     gridContainer.children[0].focus();
   }
   
@@ -105,12 +111,14 @@ function initGame(rows = 10, columns = 10) {
     }
   }
 
-  function handleCellClick(cell) {
-    if (cell.dataset.shipType === battleship.name) {
+  function handleCellClick(cell, row, col) {
+    const shipType = shipPositions[row + '-' + col];
+
+    if (shipType === battleship.name) {
       battleship.hitOrSank();
-    } else if (cell.dataset.shipType === destroyer1.name) {
+    } else if (shipType === destroyer1.name) {
       destroyer1.hitOrSank();
-    } else if (cell.dataset.shipType === destroyer2.name) {
+    } else if (shipType === destroyer2.name) {
       destroyer2.hitOrSank();
     } else {
       alert('You missed!');
@@ -121,7 +129,7 @@ function initGame(rows = 10, columns = 10) {
   }
 }
 
-function markRandomSequence(gridContainer, ship, rows, columns) {
+function markRandomSequence(gridContainer, ship, rows, columns, shipPositions) {
   const isRow = Math.random() < 0.5;
   let startRow, startCol;
 
@@ -129,25 +137,26 @@ function markRandomSequence(gridContainer, ship, rows, columns) {
   do {
     startRow = Math.floor(Math.random() * (rows - ship.squares));
     startCol = Math.floor(Math.random() * (columns - ship.squares));
-  } while (checkCollision(gridContainer, startRow, startCol, ship.squares, isRow, columns));
+  } while (checkCollision(startRow, startCol, ship.squares, isRow, columns, shipPositions));
 
   for (let i = 0; i < ship.squares; i++) {
     const row = isRow ? startRow : startRow + i;
     const col = isRow ? startCol + i : startCol;
 
     const cell = gridContainer.children[row * columns + col];
+    // Adding class name here only to show better where the ships are.
+    // It needs to be removed in a real game, otherwise players can easily see where is the ship by inspecting the DOM element
     cell.classList.add(ship.name)
-    cell.dataset.shipType = ship.name;
+    shipPositions[row + '-' + col] = ship.name;
   }
 }
 
-function checkCollision(gridContainer, startRow, startCol, squaresNumber, isRow, columns) {
+function checkCollision(startRow, startCol, squaresNumber, isRow, columns, shipPositions) {
   for (let i = 0; i < squaresNumber; i++) {
     const row = isRow ? startRow : startRow + i;
     const col = isRow ? startCol + i : startCol;
 
-    const cell = gridContainer.children[row * columns + col];
-    if (cell.dataset.shipType) {
+    if (shipPositions[row + '-' + col]) {
       return true;
     }
   }
