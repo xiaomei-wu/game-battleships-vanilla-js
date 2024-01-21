@@ -40,30 +40,25 @@ function initGame(rows = 10, columns = 10) {
             gridItem.className = 'grid-item';
             gridContainer.appendChild(gridItem);
 
-            gridItem.onclick = function() {
-              if (this.dataset.shipType === battleship.name) {
-                battleship.hitOrSank();
-                this.classList.add("disabled")
-                checkEndGame()
-                return;
+            // Make every cell focusable
+            gridItem.tabIndex = 0;
+            gridItem.onclick = function () {
+              handleCellClick(this);
+            };
+      
+            gridItem.addEventListener('keydown', function (event) {
+              if (event.key === 'Enter' && !gridItem.classList.contains("disabled")) {
+                handleCellClick(this);
+              } else if (event.key === 'ArrowLeft') {
+                moveFocus(this, -1);
+              } else if (event.key === 'ArrowUp') {
+                moveFocus(this, -columns);
+              } else if(event.key === 'ArrowRight') {
+                moveFocus(this, + 1)
+              } else if(event.key === 'ArrowDown') {
+                moveFocus(this, columns)
               }
-          
-              if(this.dataset.shipType === destroyer1.name) {
-                destroyer1.hitOrSank();
-                this.classList.add("disabled")
-                checkEndGame()
-                return;
-              }
-          
-              if(this.dataset.shipType === destroyer2.name) {
-                destroyer2.hitOrSank();
-                this.classList.add("disabled")
-                checkEndGame()
-                return;
-              }
-
-              alert('You missed!');
-            }
+            });
         }
     }
 
@@ -71,6 +66,7 @@ function initGame(rows = 10, columns = 10) {
     markRandomSequence(gridContainer, battleship, rows, columns);
     markRandomSequence(gridContainer, destroyer1, rows, columns); 
     markRandomSequence(gridContainer, destroyer2, rows, columns);
+    gridContainer.children[0].focus();
   });
 
   function checkEndGame() {
@@ -82,9 +78,46 @@ function initGame(rows = 10, columns = 10) {
   }
 
   function resetGame() {
-    setTimeout(function(){
-      location.reload();
-    }, 2000);
+    const gridContainer = document.getElementById('gridContainer');
+    const gridItems = gridContainer.getElementsByClassName('grid-item');
+    
+    Array.from(gridItems).forEach((item) => {
+      item.classList.remove(battleship.name, destroyer1.name, destroyer2.name, 'disabled');
+      item.dataset.shipType = '';
+    });
+  
+    battleship.hits = 0;
+    destroyer1.hits = 0;
+    destroyer2.hits = 0;
+  
+    markRandomSequence(gridContainer, battleship, rows, columns);
+    markRandomSequence(gridContainer, destroyer1, rows, columns); 
+    markRandomSequence(gridContainer, destroyer2, rows, columns);
+    gridContainer.children[0].focus();
+  }
+  
+  function moveFocus(currentCell, moveBy) {
+    const index = Array.from(currentCell.parentElement.children).indexOf(currentCell);
+    const nextIndex = index + moveBy;
+  
+    if (nextIndex >= 0 && nextIndex < currentCell.parentElement.children.length) {
+      currentCell.parentElement.children[nextIndex].focus();
+    }
+  }
+
+  function handleCellClick(cell) {
+    if (cell.dataset.shipType === battleship.name) {
+      battleship.hitOrSank();
+    } else if (cell.dataset.shipType === destroyer1.name) {
+      destroyer1.hitOrSank();
+    } else if (cell.dataset.shipType === destroyer2.name) {
+      destroyer2.hitOrSank();
+    } else {
+      alert('You missed!');
+      return;
+    }
+    cell.classList.add("disabled");
+    checkEndGame();
   }
 }
 

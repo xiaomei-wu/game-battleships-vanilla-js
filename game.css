@@ -19,6 +19,14 @@ body {
   cursor: pointer;
 }
 
+.grid-item:hover {
+  background-color: #f0f8ff;
+}
+
+.grid-item:focus {
+  background-color: #f0f8ff;;
+}
+
 /* Show the ships for demo purpose */
 .battleship {
   background-color: rgb(228, 231, 146);
