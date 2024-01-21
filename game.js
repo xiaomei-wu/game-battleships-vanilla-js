@@ -31,7 +31,7 @@ function initGame(rows = 10, columns = 10) {
   const destroyer1 = new Ship("destroyer1", 4);
   const destroyer2 = new Ship("destroyer2", 4);
 
-  const shipPositions = {}; 
+  let shipPositions = {}; 
 
   document.addEventListener('DOMContentLoaded', function () {
     let gridContainer = document.getElementById('gridContainer');
@@ -91,11 +91,9 @@ function initGame(rows = 10, columns = 10) {
     battleship.hits = 0;
     destroyer1.hits = 0;
     destroyer2.hits = 0;
-
-    shipPositions.battleship = [];
-    shipPositions.destroyer1 = [];
-    shipPositions.destroyer2 = [];
   
+    shipPositions = {}; 
+
     markRandomSequence(gridContainer, battleship, rows, columns, shipPositions);
     markRandomSequence(gridContainer, destroyer1, rows, columns, shipPositions); 
     markRandomSequence(gridContainer, destroyer2, rows, columns, shipPositions);
