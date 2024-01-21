@@ -26,7 +26,7 @@ class Ship {
   }
 }
 
-function initGame(rows, columns) {
+function initGame(rows = 10, columns = 10) {
   const battleship = new Ship("battleship", 5);
   const destroyer1 = new Ship("destroyer1", 4);
   const destroyer2 = new Ship("destroyer2", 4);
@@ -67,14 +67,10 @@ function initGame(rows, columns) {
         }
     }
 
-    /*
-    Create 1 battleship and 2 destroyers randomly: 
-    1 random array with sequence of 5
-    2 random arrays with sequence of 4
-    */
-    markRandomSequence(gridContainer, battleship.squares, battleship);
-    markRandomSequence(gridContainer, destroyer1.squares, destroyer1); 
-    markRandomSequence(gridContainer, destroyer2.squares, destroyer2);
+    // Create 1 battleship and 2 destroyers randomly on the grid: 
+    markRandomSequence(gridContainer, battleship, rows, columns);
+    markRandomSequence(gridContainer, destroyer1, rows, columns); 
+    markRandomSequence(gridContainer, destroyer2, rows, columns);
   });
 
   function checkEndGame() {
@@ -92,32 +88,32 @@ function initGame(rows, columns) {
   }
 }
 
-function markRandomSequence(gridContainer, squaresNumber, ship) {
+function markRandomSequence(gridContainer, ship, rows, columns) {
   const isRow = Math.random() < 0.5;
   let startRow, startCol;
 
   // Avoid overlap between ships
   do {
-    startRow = Math.floor(Math.random() * (squaresNumber + 1));
-    startCol = Math.floor(Math.random() * (squaresNumber + 1));
-  } while (checkCollision(gridContainer, startRow, startCol, squaresNumber, isRow));
+    startRow = Math.floor(Math.random() * (rows - ship.squares));
+    startCol = Math.floor(Math.random() * (columns - ship.squares));
+  } while (checkCollision(gridContainer, startRow, startCol, ship.squares, isRow, columns));
 
-  for (let i = 0; i < squaresNumber; i++) {
+  for (let i = 0; i < ship.squares; i++) {
     const row = isRow ? startRow : startRow + i;
     const col = isRow ? startCol + i : startCol;
 
-    const cell = gridContainer.children[row * 10 + col];
+    const cell = gridContainer.children[row * columns + col];
     cell.classList.add(ship.name)
     cell.dataset.shipType = ship.name;
   }
 }
 
-function checkCollision(gridContainer, startRow, startCol, squaresNumber, isRow) {
+function checkCollision(gridContainer, startRow, startCol, squaresNumber, isRow, columns) {
   for (let i = 0; i < squaresNumber; i++) {
     const row = isRow ? startRow : startRow + i;
     const col = isRow ? startCol + i : startCol;
 
-    const cell = gridContainer.children[row * 10 + col];
+    const cell = gridContainer.children[row * columns + col];
     if (cell.dataset.shipType) {
       return true;
     }
@@ -125,4 +121,4 @@ function checkCollision(gridContainer, startRow, startCol, squaresNumber, isRow)
   return false;
 }
 
-initGame(10, 10)
+initGame()
