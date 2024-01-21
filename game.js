@@ -69,9 +69,9 @@ function initGame(rows = 10, columns = 10) {
     }
 
     // Create 1 battleship and 2 destroyers randomly on the grid: 
-    markRandomSequence(gridContainer, battleship, rows, columns);
-    markRandomSequence(gridContainer, destroyer1, rows, columns); 
-    markRandomSequence(gridContainer, destroyer2, rows, columns);
+    markRandomSequence(gridContainer, battleship);
+    markRandomSequence(gridContainer, destroyer1); 
+    markRandomSequence(gridContainer, destroyer2);
     gridContainer.children[0].focus();
   });
 
@@ -95,9 +95,9 @@ function initGame(rows = 10, columns = 10) {
     destroyer1 = new Ship("destroyer1", 4);
     destroyer2 = new Ship("destroyer2", 4);
 
-    markRandomSequence(gridContainer, battleship, rows, columns);
-    markRandomSequence(gridContainer, destroyer1, rows, columns); 
-    markRandomSequence(gridContainer, destroyer2, rows, columns);
+    markRandomSequence(gridContainer, battleship);
+    markRandomSequence(gridContainer, destroyer1);
+    markRandomSequence(gridContainer, destroyer2);
     gridContainer.children[0].focus();
   }
   
@@ -111,21 +111,26 @@ function initGame(rows = 10, columns = 10) {
   }
 
   function handleCellClick(cell, row, col) {
-    if (battleship.positions[`${row}-${col}`]) {
+    const shipType = battleship.positions[`${row}-${col}`] || 
+    destroyer1.positions[`${row}-${col}`] || 
+    destroyer2.positions[`${row}-${col}`];
+
+    if (shipType === battleship.name) {
       battleship.hitOrSank();
-    } else if (destroyer1.positions[`${row}-${col}`]) {
+    } else if (shipType === destroyer1.name) {
       destroyer1.hitOrSank();
-    } else if (destroyer2.positions[`${row}-${col}`]) {
+    } else if (shipType === destroyer2.name) {
       destroyer2.hitOrSank();
     } else {
       alert('You missed!');
       return;
     }
+    
     cell.classList.add("disabled");
     checkEndGame();
   }
 
-  function markRandomSequence(gridContainer, ship, rows, columns) {
+  function markRandomSequence(gridContainer, ship) {
     const isRow = Math.random() < 0.5;
     let startRow, startCol;
   
@@ -158,7 +163,7 @@ function initGame(rows = 10, columns = 10) {
         return true;
       }
     }
-    
+
     return false;
   }
 }
